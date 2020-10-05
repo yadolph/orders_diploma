@@ -1,0 +1,6 @@
+Django==2.2.16
+pytz==2018.5
+djangorestframework
+markdown
+django-filter
+django-rest-passwordreset
