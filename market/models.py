@@ -128,6 +128,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, verbose_name='Категория', related_name='products', blank=True,
                                  on_delete=models.CASCADE, null=True)
 
+    shop = models.ForeignKey(Shop, related_name='products', blank=True, null=True, on_delete=models.CASCADE)
+
     class Meta:
         verbose_name = 'Продукт'
         verbose_name_plural = "Список продуктов"

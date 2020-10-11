@@ -1,0 +1,44 @@
+shop: DNS
+categories:
+  - id: 224
+    name: Смартфоны
+  - id: 15
+    name: Аксессуары
+  - id: 1
+    name: Flash-накопители
+
+goods:
+  - id: 4216292
+    category: 224
+    model: apple/iphone/xs-max
+    name: Смартфон Apple iPhone XS Max 512GB (золотистый)
+    price: 109990
+    price_rrc: 117990
+    quantity: 10
+    parameters:
+      "Диагональ (дюйм)": 6.5
+      "Разрешение (пикс)": 2688x1242
+      "Встроенная память (Гб)": 512
+      "Цвет": золотистый
+  - id: 5624578
+    category: 224
+    model: samsung/galaxy/note-20
+    name: Смартфон Samsung Galaxy Note 20 256 ГБ зеленый
+    price: 69999
+    price_rrc: 72000
+    quantity: 5
+    parameters:
+      "Диагональ (дюйм)": 6.1
+      "Разрешение (пикс)": 1792x828
+      "Встроенная память (Гб)": 256
+      "Цвет": красный
+  - id: 8523215
+    category: 1
+    model: kingston/datatraveler
+    name: USB Flash Kingston DataTraveler DT100G3 64 ГБ
+    price: 799
+    price_rrc: 899
+    quantity: 50
+    parameters:
+      "Объем памяти(Гб)": 64
+      "Стандарт USB": USB 3.2 Gen 1

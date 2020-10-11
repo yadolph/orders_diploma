@@ -17,12 +17,12 @@ class ProductParameterSerializer(serializers.ModelSerializer):
 
 
 class ProductInfoSerializer(serializers.ModelSerializer):
-    product_parameters_info = ProductParameterSerializer(many=True)
+    product_parameters = ProductParameterSerializer(many=True)
     shop = serializers.StringRelatedField()
 
     class Meta:
         model = ProductInfo
-        fields = ('shop', 'name', 'quantity', 'price', 'price_rrc', 'product_parameters_info')
+        fields = ('shop', 'quantity', 'price', 'price_rrc', 'product_parameters')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -31,20 +31,38 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('id', 'name')
 
 
-class ProductSerializer(serializers.ModelSerializer):
-  #  product_info_product = ProductInfoSerializer(many=True)
-
-    class Meta:
-        model = Product
-        fields = ('id', 'name')
-
-
 class ShopSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Shop
-        fields = ('name', 'filename', 'categories', 'products', 'owner')
+        fields = ('name', 'categories', 'products', 'owner')
+
+
+class ShopSerializerShort(serializers.ModelSerializer):
+
+    class Meta:
+        model = Shop
+        fields = ('name', 'id')
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    shop = ShopSerializerShort()
+    category = CategorySerializer()
+
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'shop', 'category',)
+
+
+class ProductCardSerializer(serializers.ModelSerializer):
+    shop = ShopSerializerShort()
+    category = CategorySerializer()
+    product_infos = ProductInfoSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'shop', 'category', 'product_infos')
 
 
 class UserSerializer(serializers.ModelSerializer):
