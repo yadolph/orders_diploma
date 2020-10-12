@@ -71,6 +71,7 @@ class User(AbstractUser):
             'unique': _("A user with that username already exists."),
         },
     )
+    cart = models.CharField(verbose_name='Корзина', max_length=150, blank=True, null=True)
     is_active = models.BooleanField(
         _('active'),
         default=False,

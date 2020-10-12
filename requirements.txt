@@ -1,5 +1,6 @@
 Django==2.2.16
 pytz==2018.5
+pyyaml==5.3.1
 djangorestframework
 markdown
 django-filter

@@ -8,6 +8,7 @@ from market.serializers import ProductSerializer, ProductCardSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 import yaml
+import json
 
 
 class ProductView(APIView):
@@ -24,7 +25,18 @@ class ProductView(APIView):
 class SingleProductView(APIView):
 
     def get(self, request, pk, *args, **kwargs):
+        cart = request.session.get('cart', {})
         product = Product.objects.get(id=pk)
+
+        if request.GET.get('add_to_cart', False):
+            quantity = request.GET.get('quantity', 1)
+            cart[pk] = quantity
+            request.session['cart'] = cart
+            request.session.modified = True
+            if request.user.is_authenticated:
+                request.user.cart = json.dumps(cart)
+                request.user.save()
+
         serializer = ProductCardSerializer(product, many=False)
         return Response(serializer.data)
 
