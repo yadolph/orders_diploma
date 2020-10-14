@@ -29,7 +29,11 @@ class SingleProductView(APIView):
         product = Product.objects.get(id=pk)
 
         if request.GET.get('add_to_cart', False):
-            quantity = request.GET.get('quantity', 1)
+            print(cart)
+            if str(pk) in cart.keys():
+                return JsonResponse({'Status': False, 'Error': 'Данный товар уже в корзине'})
+
+            quantity = int(request.GET.get('quantity', 1))
             cart[pk] = quantity
             request.session['cart'] = cart
             request.session.modified = True
@@ -56,10 +60,7 @@ class PartnerUpdate(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-        data = request.POST['data']
-        print(f'!!!! TYPE TYPE TYPE {type(data)}')
         data = yaml.load(request.POST['data'], Loader=yaml.FullLoader)
-        print(data)
 
         shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
         for category in data['categories']:
@@ -86,8 +87,62 @@ class PartnerUpdate(APIView):
                                                 value=value)
 
         return JsonResponse({'Status': True})
+        #  Ошибки ?
 
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+class CartView(APIView):
+
+    def assemble_cart(self,request):
+        response = []
+        cart = request.session.get('cart', False)
+        print(cart)
+        if cart:
+            for id, quantity in cart.items():
+                id, quantity = int(id), int(quantity)
+                product = Product.objects.get(id=id)
+                shop = product.shop
+                response.append({'id': id,
+                                 'name': product.name,
+                                 'quantity': quantity,
+                                 #'price': product.product_infos.price,
+                                 'shop': {'id': shop.id, 'name': shop.name}
+                                 })
+            return JsonResponse(response, safe=False)
+        else:
+            return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
+
+
+    def get(self, request, *args, **kwargs):
+        return self.assemble_cart(request)
+
+    def post(self,request, *args, **kwargs):
+        id = request.POST.get('id')
+        quantity = int(request.POST.get('quantity'))
+        cart = request.session.get('cart', False)
+
+        if not cart:
+            return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
+
+        print(cart)
+        print(id)
+
+        if not id or not quantity:
+            return JsonResponse({'Status': False, 'Error': 'Неверно переданы данные в запросе'})
+
+        if id not in cart:
+            return JsonResponse({'Status': False, 'Error': 'Товар с данным id отсутствует в корзине'})
+
+        if id and quantity == -1:
+            cart.pop(id)
+            request.session['cart'] = cart
+            request.session.modified = True
+            return self.assemble_cart(request)
+
+        if id and quantity:
+            cart[id] = quantity
+            request.session['cart'] = cart
+            request.session.modified = True
+            return self.assemble_cart(request)
 
 
 class SignIn(APIView):
@@ -97,14 +152,16 @@ class SignIn(APIView):
 
     def post(self, request):
         username = request.POST['username']
-        print(username)
-
         password = request.POST['password']
-        print(password)
         user = authenticate(request, username=username, password=password)
-        print(authenticate(request, username=username, password=password))
         if user is not None:
             login(request, user)
+            session_cart = request.session.get('cart', False)
+            user_cart = json.loads(user.cart)
+            if session_cart:
+                user.cart = json.dumps(session_cart)
+            elif user_cart:
+                request.session['cart'] = user_cart
             return JsonResponse({'Status': True, 'Message': f'Вы залогинились как {user.username}'})
         else:
             return JsonResponse({'Status': False, 'Errors': 'Вы не залогинились'})
@@ -123,11 +180,25 @@ class SignUp(APIView):
         return JsonResponse({'Status': True, 'Message': f'Создан пользователь {user.username} с id {user.id}'})
 
 
-class LogOut(APIView):
+class SignOut(APIView):
 
     def get(self, request):
         logout(request)
         return JsonResponse({'Status': True, 'Message': 'Logout Success'})
+
+
+class CartClear(APIView):
+
+    def get(self, request):
+        cart = request.session.get('cart', {})
+
+        if cart:
+            cart = {}
+            request.session['cart'] = cart
+            request.session.modified = True
+            return JsonResponse({'Status': True})
+
+        return JsonResponse({'Status': False})
 
 
 class CheckUser(APIView):
