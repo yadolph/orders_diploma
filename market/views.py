@@ -3,8 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
-from market.models import User, Product, ProductInfo, ProductParameter, Shop, Category, Parameter
-from market.serializers import ProductSerializer, ProductCardSerializer
+from market.models import User, Product, ProductInfo, ProductParameter, Shop, Category, Parameter, Order, OrderItem
+from market.serializers import ProductSerializer, ProductCardSerializer, OrderSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 import yaml
@@ -95,18 +95,23 @@ class CartView(APIView):
     def assemble_cart(self,request):
         response = []
         cart = request.session.get('cart', False)
+        total = 0
         print(cart)
         if cart:
             for id, quantity in cart.items():
                 id, quantity = int(id), int(quantity)
                 product = Product.objects.get(id=id)
+                product_info = product.product_infos.get()
                 shop = product.shop
                 response.append({'id': id,
                                  'name': product.name,
                                  'quantity': quantity,
-                                 #'price': product.product_infos.price,
+                                 'price': product_info.price,
+                                 'subtotal': product_info.price * quantity,
                                  'shop': {'id': shop.id, 'name': shop.name}
                                  })
+                total += product_info.price * quantity
+            response.append({'total': total})
             return JsonResponse(response, safe=False)
         else:
             return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
@@ -132,7 +137,7 @@ class CartView(APIView):
         if id not in cart:
             return JsonResponse({'Status': False, 'Error': 'Товар с данным id отсутствует в корзине'})
 
-        if id and quantity == -1:
+        if id and quantity >= 0:
             cart.pop(id)
             request.session['cart'] = cart
             request.session.modified = True
@@ -143,6 +148,41 @@ class CartView(APIView):
             request.session['cart'] = cart
             request.session.modified = True
             return self.assemble_cart(request)
+
+
+class PlaceOrder(APIView):
+    def get(self, request, *args, **kwargs):
+        cart_viewer = CartView()
+        return cart_viewer.assemble_cart(request)
+
+    def post(self, request, *args, **kwargs):
+        confirmation = request.POST.get('order', False)
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({'Status': False, 'Error': 'Пожалуйста, зарегистрируйтесь или авторизуйтесь'})
+        if confirmation:
+            cart = request.session.get('cart')
+            if not cart:
+                return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
+            contact, _ = user.contacts.get_or_create(user=user, city='Empty', street='Empty', phone='Empty')
+            order = Order(user=user, state='new', contact=contact)
+            order.save()
+
+            #  Добавить возможность редактирования контактов
+
+            for id, quantity in cart.items():
+                id, quantity = int(id), int(quantity)
+                product = Product.objects.get(id=id)
+                product_info = product.product_infos.get()
+                order_item = OrderItem(order=order, product=product, product_info=product_info, quantity=quantity)
+                order_item.save()
+
+            serializer = OrderSerializer(order)
+            response_data = serializer.data
+            response_data['Status'], response_data['Message'] = True, 'Ваш заказ создан'
+            request.session['cart'] = {}
+            return Response(response_data)
+
 
 
 class SignIn(APIView):

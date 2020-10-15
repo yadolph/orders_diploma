@@ -235,6 +235,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, verbose_name='Заказ', related_name='ordered_items', blank=True,
                               on_delete=models.CASCADE)
 
+    product = models.ForeignKey(Product, verbose_name='Товар', blank=True, on_delete=models.CASCADE, null=True)
     product_info = models.ForeignKey(ProductInfo, verbose_name='Информация о продукте', related_name='ordered_items',
                                      blank=True,
                                      on_delete=models.CASCADE)

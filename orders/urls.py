@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from market.views import ProductView, PartnerUpdate, SignIn, SignUp, CheckUser, \
-    SignOut, SingleProductView, CartView, CartClear
+    SignOut, SingleProductView, CartView, CartClear, PlaceOrder
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,5 @@ urlpatterns = [
     path('product/<int:pk>', SingleProductView.as_view()),
     path('cart/', CartView.as_view()),
     path('cartclear/', CartClear.as_view()),
+    path('place_order/', PlaceOrder.as_view()),
 ]

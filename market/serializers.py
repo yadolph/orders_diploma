@@ -71,13 +71,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('first_name', 'last_name', 'email', 'company', 'position', 'type', 'password')
 
 
-class OrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ('user', 'status')
-
-
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ('order', 'shop', 'product', 'quantity')
+        fields = ('order', 'product', 'quantity')
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    ordered_items = OrderItemSerializer(read_only=True, many=True)
+    class Meta:
+        model = Order
+        fields = ('user', 'state', 'ordered_items')
