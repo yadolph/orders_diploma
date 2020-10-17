@@ -7,6 +7,7 @@ from market.models import User, Product, ProductInfo, ProductParameter, Shop, Ca
 from market.serializers import ProductSerializer, ProductCardSerializer, OrderSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
+from django.shortcuts import redirect
 import yaml
 import json
 
@@ -184,6 +185,23 @@ class PlaceOrder(APIView):
             return Response(response_data)
 
 
+class OrderList(APIView):
+    def get(self, request, *args, **kwargs):
+        user=request.user
+        if not user.is_authenticated:
+            return JsonResponse({'Status': False, 'Error': 'Пожалуйста, зарегистрируйтесь или авторизуйтесь'})
+        id = request.GET.get('id', 0)
+
+        if id:
+            orders = user.orders.filter(id=id)
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data)
+
+        orders = user.orders.filter()
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+
+
 
 class SignIn(APIView):
 
@@ -202,7 +220,9 @@ class SignIn(APIView):
                 user.cart = json.dumps(session_cart)
             elif user_cart:
                 request.session['cart'] = user_cart
-            return JsonResponse({'Status': True, 'Message': f'Вы залогинились как {user.username}'})
+
+            #return JsonResponse({'Status': True, 'Message': f'Вы залогинились как {user.username}'})
+            return redirect('check_user')
         else:
             return JsonResponse({'Status': False, 'Errors': 'Вы не залогинились'})
 
@@ -245,4 +265,6 @@ class CheckUser(APIView):
 
     def get(self, request):
         print(request.user.username)
-        return JsonResponse({'Message': f'Вы зашли как {request.user.username} с id {request.user.id}'})
+        csrf = request.COOKIES.get('csrftoken')
+        return JsonResponse({'Message': f'Вы зашли как {request.user.username} с id {request.user.id}',
+                             'X-CSRFToken': csrf})
