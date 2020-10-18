@@ -230,7 +230,7 @@ class SignIn(APIView):
 class SignUp(APIView):
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse('Use POST bro')
+        return JsonResponse({'Status': False, 'Error': 'К данному API View необходимо обратиться через POST'})
 
     def post(self, request):
         username = request.POST['username']
@@ -268,3 +268,7 @@ class CheckUser(APIView):
         csrf = request.COOKIES.get('csrftoken')
         return JsonResponse({'Message': f'Вы зашли как {request.user.username} с id {request.user.id}',
                              'X-CSRFToken': csrf})
+
+class ContactUpdate(APIView):
+    pass
+    
