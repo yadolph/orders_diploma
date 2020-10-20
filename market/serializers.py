@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from market.models import Shop, Category, Product, ProductInfo, ProductParameter, Parameter, User, Order, OrderItem
+from market.models import Shop, Category, Product, ProductInfo, \
+    ProductParameter, Parameter, User, Order, OrderItem, Contact
 
 
 class ParameterSerializer(serializers.ModelSerializer):
@@ -78,8 +79,15 @@ class OrderItemSerializer(serializers.ModelSerializer):
         fields = ('order', 'product', 'quantity')
 
 
+class ContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contact
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
     ordered_items = OrderItemSerializer(read_only=True, many=True)
+    contact = ContactSerializer()
     class Meta:
         model = Order
-        fields = ('id', 'user', 'state', 'ordered_items', 'dt')
+        fields = ('id', 'user', 'state', 'ordered_items', 'dt', 'contact')

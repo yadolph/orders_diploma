@@ -3,8 +3,9 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
-from market.models import User, Product, ProductInfo, ProductParameter, Shop, Category, Parameter, Order, OrderItem
-from market.serializers import ProductSerializer, ProductCardSerializer, OrderSerializer
+from market.models import User, Product, ProductInfo, ProductParameter, \
+    Shop, Category, Parameter, Order, OrderItem, Contact
+from market.serializers import ProductSerializer, ProductCardSerializer, OrderSerializer, ContactSerializer
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.shortcuts import redirect
@@ -157,19 +158,28 @@ class PlaceOrder(APIView):
         return cart_viewer.assemble_cart(request)
 
     def post(self, request, *args, **kwargs):
-        confirmation = request.POST.get('order', False)
+        confirmation = bool(request.POST.get('order', False))
         user = request.user
         if not user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Пожалуйста, зарегистрируйтесь или авторизуйтесь'})
         if confirmation:
             cart = request.session.get('cart')
+            contact_id = request.POST.get('contact_id')
             if not cart:
                 return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
-            contact, _ = user.contacts.get_or_create(user=user, city='Empty', street='Empty', phone='Empty')
+            if not contact_id:
+                try:
+                    contact = user.contacts.filter(user=user).latest('id')
+                except Contact.DoesNotExist:
+                    return JsonResponse({'Status': False, 'Error': 'У вашей учетной записи не заполнены контакты'})
+            else:
+                try:
+                    contact = user.contacts.filter(user=user, id=contact_id).latest('id')
+                except Contact.DoesNotExist:
+                    return JsonResponse({'Status': False, 'Error': 'Не найден список контактов по id'})
+
             order = Order(user=user, state='new', contact=contact)
             order.save()
-
-            #  Добавить возможность редактирования контактов
 
             for id, quantity in cart.items():
                 id, quantity = int(id), int(quantity)
@@ -183,6 +193,8 @@ class PlaceOrder(APIView):
             response_data['Status'], response_data['Message'] = True, 'Ваш заказ создан'
             request.session['cart'] = {}
             return Response(response_data)
+        else:
+            self.get(request)
 
 
 class OrderList(APIView):
@@ -206,7 +218,7 @@ class OrderList(APIView):
 class SignIn(APIView):
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse('Use POST bro')
+        return JsonResponse({'Status': False, 'Error': 'К данному API View необходимо обратиться через POST'})
 
     def post(self, request):
         username = request.POST['username']
@@ -270,5 +282,48 @@ class CheckUser(APIView):
                              'X-CSRFToken': csrf})
 
 class ContactUpdate(APIView):
-    pass
-    
+
+    def assemble_contact_list(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({'Status': False, 'Error': 'Авторизуйтесь или зарегистрируйтесь для просмотра раздела'})
+        contacts = user.contacts.filter(user=user)
+        if not contacts:
+            return JsonResponse({'Status': False, 'Error': 'Ваши контакты не заполнены'})
+        serializer = ContactSerializer(contacts, many=True)
+        return Response(serializer.data)
+
+    def get(self, request):
+        return self.assemble_contact_list(request)
+
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({'Status': False, 'Error': 'Авторизуйтесь или зарегистрируйтесь'})
+
+        contact_id = request.POST.get('contact_id', False)
+        if contact_id:
+            try:
+                contacts = user.contacts.filter(user=user, id=contact_id).latest('id')
+            except Contact.DoesNotExist:
+                return JsonResponse({'Status': False, 'Error': 'Список контактов не найден'})
+            delete = bool(request.POST.get('delete', False))
+            if delete:
+                contacts.delete()
+                return JsonResponse({'Status': True, 'Message': 'Список контактов успешно удален'})
+        else:
+            contacts = Contact(user=user)
+
+        city, street, house = request.POST.get('city'), request.POST.get('street'), request.POST.get('house', 'Empty')
+        structure, building= request.POST.get('structure', 'Empty'), request.POST.get('building', 'Empty')
+        apartment, phone = request.POST.get('apartment', 'Empty'), request.POST.get('phone')
+
+        if not city or not street or not phone or not house:
+            return JsonResponse({'Status': False, 'Error': 'Переданы не все обязательные данные'})
+
+        contacts.city, contacts.street, contacts.house = city, street, house
+        contacts.structure, contacts.building = structure, building
+        contacts.apartment, contacts.phone = apartment, phone
+        contacts.save()
+        serializer = ContactSerializer(contacts)
+        return Response(serializer.data)
