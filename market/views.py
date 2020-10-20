@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,6 +8,8 @@ from market.serializers import ProductSerializer, ProductCardSerializer, OrderSe
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.shortcuts import redirect
+from django.core.mail import send_mail
+from orders.settings import EMAIL_FROM
 import yaml
 import json
 
@@ -31,7 +32,6 @@ class SingleProductView(APIView):
         product = Product.objects.get(id=pk)
 
         if request.GET.get('add_to_cart', False):
-            print(cart)
             if str(pk) in cart.keys():
                 return JsonResponse({'Status': False, 'Error': 'Данный товар уже в корзине'})
 
@@ -192,6 +192,7 @@ class PlaceOrder(APIView):
             response_data = serializer.data
             response_data['Status'], response_data['Message'] = True, 'Ваш заказ создан'
             request.session['cart'] = {}
+            send_mail('Ваш заказ оформлен', json.dumps(response_data), EMAIL_FROM, (user.email,), fail_silently=True)
             return Response(response_data)
         else:
             self.get(request)
@@ -227,13 +228,12 @@ class SignIn(APIView):
         if user is not None:
             login(request, user)
             session_cart = request.session.get('cart', False)
-            user_cart = json.loads(user.cart)
+            user_cart = user.cart
             if session_cart:
                 user.cart = json.dumps(session_cart)
             elif user_cart:
-                request.session['cart'] = user_cart
+                request.session['cart'] = json_loads(user_cart)
 
-            #return JsonResponse({'Status': True, 'Message': f'Вы залогинились как {user.username}'})
             return redirect('check_user')
         else:
             return JsonResponse({'Status': False, 'Errors': 'Вы не залогинились'})
@@ -249,7 +249,9 @@ class SignUp(APIView):
         password = request.POST['password']
         user = User.objects.create_user(username=username, email=username, password=password, is_active=True)
         user.save()
-        return JsonResponse({'Status': True, 'Message': f'Создан пользователь {user.username} с id {user.id}'})
+        response_text = f'Вы успешно зарегистрированы в магазине. Имя пользователя - {username}, пароль - {password}'
+        send_mail('Регистрация в магазине', response_text, EMAIL_FROM, (username,), fail_silently=True)
+        return JsonResponse({'Status': True, 'Message': response_text})
 
 
 class SignOut(APIView):

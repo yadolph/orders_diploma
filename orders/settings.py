@@ -122,3 +122,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'market.User'
+
+
+EMAIL_HOST = 'smtp.yandex.ru'
+
+EMAIL_PORT = '465'
+
+EMAIL_HOST_USER = ''
+
+EMAIL_HOST_PASSWORD = ''
+
+EMAIL_USE_SSL = True
+
+EMAIL_FROM = ''
