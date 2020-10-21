@@ -48,12 +48,9 @@ class SingleProductView(APIView):
 
 
 class PartnerUpdate(APIView):
-    """
-    Класс для обновления прайса от поставщика
-    """
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse('Use POST bro')
+        return JsonResponse({'Status': False, 'Error': 'К данному API View необходимо обратиться через POST'})
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -62,9 +59,15 @@ class PartnerUpdate(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-        data = yaml.load(request.POST['data'], Loader=yaml.FullLoader)
+        file = request.FILES.get('data', False)
 
-        shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
+        if file:
+            data = file.read()
+            data = yaml.load(data, Loader=yaml.FullLoader)
+        else:
+            data = yaml.load(request.POST['data'], Loader=yaml.FullLoader)
+
+        shop, _ = Shop.objects.get_or_create(name=data['shop'])
         for category in data['categories']:
             category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
             category_object.shops.add(shop.id)
@@ -74,7 +77,6 @@ class PartnerUpdate(APIView):
             product, _ = Product.objects.get_or_create(name=item['name'],
                                                        category_id=item['category'],
                                                        shop_id=shop.id)
-
             product_info = ProductInfo.objects.create(product_id=product.id,
                                                       external_id=item['id'],
                                                       model=item['model'],
@@ -89,7 +91,6 @@ class PartnerUpdate(APIView):
                                                 value=value)
 
         return JsonResponse({'Status': True})
-        #  Ошибки ?
 
 
 class CartView(APIView):
@@ -192,6 +193,8 @@ class PlaceOrder(APIView):
             response_data = serializer.data
             response_data['Status'], response_data['Message'] = True, 'Ваш заказ создан'
             request.session['cart'] = {}
+            user.cart = ''
+            user.save()
             send_mail('Ваш заказ оформлен', json.dumps(response_data), EMAIL_FROM, (user.email,), fail_silently=True)
             return Response(response_data)
         else:
@@ -213,7 +216,6 @@ class OrderList(APIView):
         orders = user.orders.filter()
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
-
 
 
 class SignIn(APIView):

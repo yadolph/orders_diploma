@@ -26,6 +26,13 @@ class ProductInfoSerializer(serializers.ModelSerializer):
         fields = ('shop', 'quantity', 'price', 'price_rrc', 'product_parameters')
 
 
+class ProductInfoShortSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ProductInfo
+        fields = ('price',)
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -50,10 +57,11 @@ class ShopSerializerShort(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     shop = ShopSerializerShort()
     category = CategorySerializer()
+    product_infos = ProductInfoShortSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'shop', 'category',)
+        fields = ('id', 'name', 'shop', 'category', 'product_infos')
 
 
 class ProductCardSerializer(serializers.ModelSerializer):
