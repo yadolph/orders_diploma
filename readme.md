@@ -17,7 +17,17 @@ pip install -r requirements.txt
  ```
 python manage.py migrate
 ```
-1.4. Запустите сервер
+1.4* Опционально - в файле orders/settings.py заполните блок настроек отправки электронной почты, если хотите, чтобы система отправляла письма. Функция отправки почты имеет параметр fail_silently=True, поэтому в случае, если вы не заполните эти параметры, ничего не произойдет, просто письма при подтверждении регистрации и заказа отправляться не будут.
+ ```
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = 'имя пользователя'
+EMAIL_HOST_PASSWORD = 'ваш пароль'
+EMAIL_USE_SSL = True
+EMAIL_FROM = 'от кого письмо?'
+```
+
+1.5. Запустите сервер
 ```
 python manage.py runserver
 ```
