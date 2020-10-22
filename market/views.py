@@ -125,7 +125,6 @@ class CartView(APIView):
         response = []
         cart = request.session.get('cart', False)
         total = 0
-        print(cart)
         if cart:
             for id, quantity in cart.items():
                 id, quantity = int(id), int(quantity)
@@ -156,9 +155,6 @@ class CartView(APIView):
 
         if not cart:
             return JsonResponse({'Status': False, 'Error': 'Ваша корзина пуста'})
-
-        print(cart)
-        print(id)
 
         if not id or not quantity:
             return JsonResponse({'Status': False, 'Error': 'Неверно переданы данные в запросе'})
@@ -240,8 +236,11 @@ class OrderList(APIView):
             return Response(serializer.data)
 
         orders = user.orders.filter()
-        serializer = OrderSerializer(orders, many=True)
-        return Response(serializer.data)
+        if orders:
+            serializer = OrderSerializer(orders, many=True)
+            return Response(serializer.data)
+        else:
+            return JsonResponse({'Status': False, 'Error': 'Ваш список заказов пуст'})
 
 
 class SignIn(APIView):
@@ -306,7 +305,6 @@ class CartClear(APIView):
 class CheckUser(APIView):
 
     def get(self, request):
-        print(request.user.username)
         csrf = request.COOKIES.get('csrftoken')
         return JsonResponse({'Message': f'Вы зашли как {request.user.username} с id {request.user.id}',
                              'X-CSRFToken': csrf})
