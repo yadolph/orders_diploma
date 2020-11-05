@@ -126,7 +126,17 @@ AUTH_USER_MODEL = 'market.User'
 
 # Настройки для отправки почты
 
+EMAIL_HOST = 'smtp.mail.ru'
 
+EMAIL_PORT = '465'
+
+EMAIL_HOST_USER = ''
+
+EMAIL_HOST_PASSWORD = ''
+
+EMAIL_USE_SSL = True
+
+EMAIL_FROM = ''
 
 
 # celery
@@ -140,7 +150,3 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_TASK_SERIALIZER = 'json'
-
-
-# send_mail('hi', 'hi', 'holytrashcan@mail.ru', ('oiv@live.ru',))
-# from django.core.mail import send_mail

@@ -20,13 +20,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41a8a8a0-7d6c-4dd4-b6a7-3955d77de1d9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/market/tasks.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/orders/celery.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/market/tasks.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/market/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/market/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/orders/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/orders/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +122,7 @@
       <workItem from="1603188616063" duration="2929000" />
       <workItem from="1603277704332" duration="12750000" />
       <workItem from="1603348459541" duration="6372000" />
-      <workItem from="1604575631729" duration="11182000" />
+      <workItem from="1604575631729" duration="12234000" />
     </task>
     <servers />
   </component>

@@ -1,5 +1,7 @@
 from celery import shared_task
 from django.core.mail import send_mail
+
+from market.models import Shop, ProductInfo, Product, Parameter, ProductParameter, Category
 from orders.settings import EMAIL_FROM
 
 #Для теста работоспособности Celery - простая задача на сложение
@@ -8,15 +10,15 @@ def adding_task(x, y):
     return x + y
 
 @shared_task
-def email(subject, message, from_email, recipient_list):
-    a = send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+def email(subject, message, from_email, recipient_list, fail_silently):
+    a = send_mail(subject, message, from_email, recipient_list, fail_silently)
     if a:
         return 'success!'
     else:
         return 'nothing has been sent'
 
 
-
+@shared_task
 def update_partner_data(data):
     shop, _ = Shop.objects.get_or_create(name=data['shop'])
     for category in data['categories']:
@@ -40,3 +42,4 @@ def update_partner_data(data):
             ProductParameter.objects.create(product_info_id=product_info.id,
                                             parameter_id=parameter_object.id,
                                             value=value)
+    return 'ok'
