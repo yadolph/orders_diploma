@@ -5,3 +5,5 @@ djangorestframework
 markdown
 django-filter
 django-rest-passwordreset
+Celery
+redis

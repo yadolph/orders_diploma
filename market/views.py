@@ -9,8 +9,8 @@ from market.serializers import ProductSerializer, ProductCardSerializer, OrderSe
 from django.contrib.auth import authenticate, login, logout
 from django.core.paginator import Paginator
 from django.shortcuts import redirect
-from django.core.mail import send_mail
 from orders.settings import EMAIL_FROM
+from market.tasks import email
 import yaml
 import json
 
@@ -217,7 +217,7 @@ class PlaceOrder(APIView):
             request.session['cart'] = {}
             user.cart = ''
             user.save()
-            send_mail('Ваш заказ оформлен', json.dumps(response_data), EMAIL_FROM, (user.email,), fail_silently=True)
+            email('Ваш заказ оформлен', json.dumps(response_data), EMAIL_FROM, (user.email,), fail_silently=True)
             return Response(response_data)
         else:
             self.get(request)
@@ -277,7 +277,7 @@ class SignUp(APIView):
         user = User.objects.create_user(username=username, email=username, password=password, is_active=True)
         user.save()
         response_text = f'Вы успешно зарегистрированы в магазине. Имя пользователя - {username}, пароль - {password}'
-        send_mail('Регистрация в магазине', response_text, EMAIL_FROM, (username,), fail_silently=True)
+        email('Регистрация в магазине', response_text, EMAIL_FROM, (username,), fail_silently=True)
         return JsonResponse({'Status': True, 'Message': response_text})
 
 

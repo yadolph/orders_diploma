@@ -124,14 +124,23 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'market.User'
 
 
-EMAIL_HOST = 'smtp.yandex.ru'
+# Настройки для отправки почты
 
-EMAIL_PORT = '465'
 
-EMAIL_HOST_USER = ''
 
-EMAIL_HOST_PASSWORD = ''
 
-EMAIL_USE_SSL = True
+# celery
 
-EMAIL_FROM = ''
+CELERY_BROKER_URL = 'redis://localhost:6699'
+
+CELERY_RESULT_BACKEND = 'redis://localhost:6699'
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+
+CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_TASK_SERIALIZER = 'json'
+
+
+# send_mail('hi', 'hi', 'holytrashcan@mail.ru', ('oiv@live.ru',))
+# from django.core.mail import send_mail
