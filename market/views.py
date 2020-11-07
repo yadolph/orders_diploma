@@ -18,33 +18,7 @@ import json
 class ProductView(APIView):
 
     def get(self, request, *args, **kwargs):
-        shop_list, cat_list = request.GET.get('shop_list', False), request.GET.get('cat_list', False)
-        if shop_list:
-            shops = Shop.objects.all()
-            serializer = ShopSerializerShort(shops, many=True)
-            return Response(serializer.data)
-
-        if cat_list:
-            cats = Category.objects.all()
-            serializer = CategorySerializer(cats, many=True)
-            return Response(serializer.data)
-
-        shop, shop_id = request.GET.get('shop', False), request.GET.get('shop_id', False)
         page = request.GET.get('page', 1)
-        if shop:
-            shop = Shop.objects.get(name=shop)
-            queryset = Product.objects.filter(shop=shop)
-        elif shop_id:
-            shop = Shop.objects.get(id=shop_id)
-            queryset = Product.objects.filter(shop=shop)
-        else:
-            queryset = Product.objects.all()
-
-        cat_id = request.GET.get('cat_id', False)
-        if cat_id:
-            category = Category.objects.get(id=cat_id)
-            queryset = queryset.filter(category=category)
-
         paginator = Paginator(queryset, 5)
         queryset = paginator.get_page(page)
         serializer = ProductSerializer(queryset, many=True)

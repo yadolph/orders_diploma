@@ -1,26 +1,18 @@
-"""orders URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from market.views import ProductView, PartnerUpdate, SignIn, SignUp, CheckUser, \
     SignOut, SingleProductView, CartView, CartClear, PlaceOrder, OrderList, ContactUpdate
+from rest_framework.routers import DefaultRouter
+from market import viewsets
+
+router = DefaultRouter()
+router.register('categories', viewsets.CategoryViewSet)
+router.register('shops', viewsets.ShopViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', ProductView.as_view()),
+    path('', include(router.urls)),
     path('partner_update/', PartnerUpdate.as_view()),
     path('signin/', SignIn.as_view()),
     path('signup/', SignUp.as_view()),
