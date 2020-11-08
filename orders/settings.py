@@ -149,7 +149,7 @@ EMAIL_USE_SSL = True
 EMAIL_FROM = ''
 
 
-# celery
+# Настройки celery
 
 CELERY_BROKER_URL = 'redis://localhost:6699'
 

@@ -1,7 +1,7 @@
 # API для маркетплейса
 ## Руководство по использованию
 
-### 0. OpenAPI
+### 0.1 OpenAPI
 Автоматически сгенерированная схема OpenAPI для Postman доступна по адресу:
 https://documenter.getpostman.com/view/13405465/TVeiDr4P
 
@@ -31,6 +31,33 @@ EMAIL_HOST_PASSWORD = 'ваш пароль'
 EMAIL_USE_SSL = True
 EMAIL_FROM = 'от кого письмо?'
 ```
+
+**1.5 Celery**
+
+Данный API маркетплейса использует фреймворк Celery для медленных задач - отправка e-mail, загрузка данных от поставщика.
+
+Чтобы обеспечить его работоспособность, на вашей локальной машине или на сервере должен быть установлен Redis + Celery. Celery устанавливается через `pip install Celery` (Уже включено в requirements.txt). Для установки redis server изучите инструкцию для вашей ОС. Для ubuntu-подобных систем redis можно установить через `sudo apt install redis-server`.
+
+В файле orders/settings.py найдите секцию "Настройки Celery":
+```
+# Настройки celery
+CELERY_BROKER_URL = 'redis://localhost:6699'
+CELERY_RESULT_BACKEND = 'redis://localhost:6699'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+```
+Для работоспособности введите адрес вашего брокера сообщений Redis. 
+
+После запуска redis-server запустить worker-а Celery можно путем выполнения следующей команды в корне проекта:
+```
+celery -A orders worker --loglevel=info
+
+# Ключ loglevel можно исключить, если логирование не нужно
+```
+Теперь worker готов принимать задачи от системы API маркетплейса
+
+
 ### 2. Настройка пользователей
 **2.1. Создайте суперпользователя:**
 ```
