@@ -57,6 +57,26 @@ celery -A orders worker --loglevel=info
 ```
 Теперь worker готов принимать задачи от системы API маркетплейса
 
+**1.6 Тесты**
+
+Для запуска встроенных тестов выполните в корне теста команду `pytest`
+
+Пример результата:
+```
+(venv) ivan@ivan-MS-7C02:~/orders_diploma$ pytest
+=================================== test session starts ===================================
+platform linux -- Python 3.8.5, pytest-6.1.2, py-1.9.0, pluggy-0.13.1
+django: settings: orders.settings (from ini)
+rootdir: /home/ivan/orders_diploma, configfile: pytest.ini
+plugins: django-4.1.0
+collected 6 items                                                                                                                                                                                                                                        
+
+market/views_tests.py ......                                                                                                                                                                                                                       [100%]
+
+=================================== 6 passed in 0.65s ===================================
+```
+
+
 
 ### 2. Настройка пользователей
 **2.1. Создайте суперпользователя:**
