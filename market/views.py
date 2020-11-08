@@ -18,7 +18,16 @@ import json
 class ProductView(APIView):
 
     def get(self, request, *args, **kwargs):
-        queryset = Product.objects.filter()
+        shop_id, cat_id = request.GET.get('shop_id', False), request.GET.get('cat_id', False)
+        if shop_id:
+            shop = Shop.objects.get(id=shop_id)
+            queryset = Product.objects.filter(shop=shop)
+        else:
+            queryset = Product.objects.filter()
+        if cat_id:
+            category = Category.objects.get(id=cat_id)
+            queryset = queryset.filter(category=category)
+
         page = request.GET.get('page', 1)
         paginator = Paginator(queryset, 5)
         queryset = paginator.get_page(page)
