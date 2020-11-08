@@ -5,12 +5,13 @@ from market.serializers import ShopSerializerShort, CategorySerializer, ShopSeri
 
 class ShopViewSet(viewsets.ModelViewSet):
     queryset = Shop.objects.all()
+    serializer_class = ShopSerializerShort
 
     def get_serializer_class(self):
-        if self.action == 'list':
-            return ShopSerializerShort
         if self.action == 'retrieve':
             return ShopSerializer
+        else:
+            return ShopSerializerShort
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

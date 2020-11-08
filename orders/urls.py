@@ -4,6 +4,7 @@ from market.views import ProductView, PartnerUpdate, SignIn, SignUp, CheckUser, 
     SignOut, SingleProductView, CartView, CartClear, PlaceOrder, OrderList, ContactUpdate
 from rest_framework.routers import DefaultRouter
 from market import viewsets
+from rest_framework.schemas import get_schema_view
 
 router = DefaultRouter()
 router.register('categories', viewsets.CategoryViewSet)
@@ -24,4 +25,9 @@ urlpatterns = [
     path('place_order/', PlaceOrder.as_view()),
     path('order_list/', OrderList.as_view()),
     path('contacts/', ContactUpdate.as_view()),
+    path('openapi', get_schema_view(
+        title='MarketplaceAPI',
+        description='API for diploma',
+        urlconf='orders.urls',
+    ), name='openapi-schema')
 ]
