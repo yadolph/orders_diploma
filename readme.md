@@ -71,7 +71,7 @@ rootdir: /home/ivan/orders_diploma, configfile: pytest.ini
 plugins: django-4.1.0
 collected 6 items                                                                                                                                                                                                                                        
 
-market/views_tests.py ......                                                                                                                                                                                                                       [100%]
+market/views_tests.py ......                                                       [100%]
 
 =================================== 6 passed in 0.65s ===================================
 ```
