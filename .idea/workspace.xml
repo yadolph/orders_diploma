@@ -20,9 +20,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="41a8a8a0-7d6c-4dd4-b6a7-3955d77de1d9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/market/views_tests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/market/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/market/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/orders/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/orders/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/readme.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +69,13 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/market/fixtures" />
+      <recent name="$PROJECT_DIR$/market" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="orders" type="Python.DjangoServer" factoryName="Django server">
@@ -124,7 +134,7 @@
       <workItem from="1604575631729" duration="12620000" />
       <workItem from="1604775361311" duration="6437000" />
       <workItem from="1604825790990" duration="6311000" />
-      <workItem from="1604846597878" duration="760000" />
+      <workItem from="1604846597878" duration="13522000" />
     </task>
     <servers />
   </component>
